@@ -99,39 +99,8 @@ The GUI provides a simple way to interact with the different hostel management f
 ## Project Structure
 
 ```text
-SmartHostel-Java-Management-System
+SmartHostel-Java-Management-System/
 │
-├── src
-│   └── main
-│       └── java
-│           └── com
-│               └── smarthostel
-│                   │
-│                   ├── Main.java
-│                   │
-│                   ├── model
-│                   │   ├── User.java
-│                   │   ├── Student.java
-│                   │   ├── Admin.java
-│                   │   ├── Room.java
-│                   │   ├── Payment.java
-│                   │   └── Complaint.java
-│                   │
-│                   ├── service
-│                   │   ├── RoomAllocator.java
-│                   │   └── ComplaintProcessor.java
-│                   │
-│                   ├── exception
-│                   │   ├── RoomNotAvailableException.java
-│                   │   └── InvalidPaymentException.java
-│                   │
-│                   ├── util
-│                   │   ├── FileManager.java
-│                   │   └── HostelUtils.java
-│                   │
-│                   └── ui
-│                       └── HostelGUI.java
-│
-├── README.md
-├── statement.md
-└── .gitignore
+├── SmartHostel.java    # Complete Java application
+├── README.md           # Project documentation
+└── statement.md        # Problem statement
