@@ -96,6 +96,11 @@ The application uses Java Swing for the desktop interface.
 
 The GUI provides a simple way to interact with the different hostel management features without having to use the command line for everything.
 
+## screenshot 
+
+<img width="1420" height="630" alt="image" src="https://github.com/user-attachments/assets/43dd6e18-a2d5-4b1c-8edb-5acece7e01f4" />
+
+
 ## Project Structure
 
 ```text
@@ -104,3 +109,6 @@ SmartHostel-Java-Management-System/
 ├── SmartHostel.java    # Complete Java application
 ├── README.md           # Project documentation
 └── statement.md        # Problem statement
+
+
+
