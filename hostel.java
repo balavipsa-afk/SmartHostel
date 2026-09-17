@@ -2,549 +2,312 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
-
-/*
- * SmartHostel
- * A simple Java hostel management system.
- *
- * Concepts demonstrated:
- * - Classes and Objects
- * - Encapsulation
- * - Inheritance
- * - Method Overriding
- * - Polymorphism
- * - Constructors
- * - Collections
- * - Exception Handling
- * - Custom Exceptions
- * - Multithreading
- * - File Handling
- * - Java Swing
- */
 
 public class SmartHostel extends JFrame {
 
-    // =========================================================
-    // DATA COLLECTIONS
-    // =========================================================
+    // Lists used to store hostel data
+    ArrayList<Student> students = new ArrayList<>();
+    ArrayList<Room> rooms = new ArrayList<>();
+    ArrayList<Payment> payments = new ArrayList<>();
+    ArrayList<Complaint> complaints = new ArrayList<>();
 
-    private final List<Student> students = new ArrayList<>();
-    private final List<Room> rooms = new ArrayList<>();
-    private final List<Payment> payments = new ArrayList<>();
-    private final List<Complaint> complaints = new ArrayList<>();
+    int studentId = 1;
+    int paymentId = 1;
+    int complaintId = 1;
 
-    private int nextStudentId = 1;
-    private int nextPaymentId = 1;
-    private int nextComplaintId = 1;
+    JTextArea display;
 
-    private JTextArea outputArea;
-
-
-    // =========================================================
-    // CONSTRUCTOR
-    // =========================================================
-
-    public SmartHostel() {
+    // Constructor
+    SmartHostel() {
 
         setTitle("SmartHostel - Hostel Management System");
-
-        setSize(950, 650);
-
+        setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
         setLocationRelativeTo(null);
 
-        initializeRooms();
-
+        createRooms();
         loadStudents();
-
-        createGUI();
+        createWindow();
     }
 
-
-    // =========================================================
-    // ROOM INITIALIZATION
-    // =========================================================
-
-    private void initializeRooms() {
-
-        // Creating 10 rooms with 2 beds each
+    // Creating hostel rooms
+    void createRooms() {
 
         for (int i = 101; i <= 110; i++) {
-
             rooms.add(new Room(i, 2));
         }
     }
 
-
-    // =========================================================
-    // GUI
-    // =========================================================
-
-    private void createGUI() {
+    // Creating the main GUI
+    void createWindow() {
 
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-
         mainPanel.setBorder(
-                BorderFactory.createEmptyBorder(
-                        15, 15, 15, 15
-                )
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
         );
 
-
-        // ---------------- HEADER ----------------
-
-        JLabel title = new JLabel(
+        JLabel heading = new JLabel(
                 "SmartHostel",
                 SwingConstants.CENTER
         );
+        heading.setFont(new Font("Arial", Font.BOLD, 28));
 
-        title.setFont(
-                new Font("Arial", Font.BOLD, 28)
-        );
-
-        JLabel subtitle = new JLabel(
-                "Java Hostel Management System",
+        JLabel subHeading = new JLabel(
+                "Hostel Management System",
                 SwingConstants.CENTER
         );
+        subHeading.setFont(new Font("Arial", Font.PLAIN, 15));
 
-        subtitle.setFont(
-                new Font("Arial", Font.PLAIN, 15)
-        );
+        JPanel top = new JPanel(new GridLayout(2, 1));
+        top.add(heading);
+        top.add(subHeading);
 
+        mainPanel.add(top, BorderLayout.NORTH);
 
-        JPanel header = new JPanel(
-                new GridLayout(2, 1)
-        );
-
-        header.add(title);
-        header.add(subtitle);
-
-
-        mainPanel.add(
-                header,
-                BorderLayout.NORTH
-        );
-
-
-        // ---------------- BUTTONS ----------------
-
-        JPanel buttonPanel = new JPanel(
+        JPanel buttons = new JPanel(
                 new GridLayout(3, 3, 10, 10)
         );
 
-        JButton addStudent =
-                new JButton("Add Student");
+        JButton addStudent = new JButton("Add Student");
+        JButton showStudents = new JButton("View Students");
+        JButton showRooms = new JButton("View Rooms");
+        JButton allocateRoom = new JButton("Allocate Room");
+        JButton addPayment = new JButton("Add Payment");
+        JButton showPayments = new JButton("View Payments");
+        JButton addComplaint = new JButton("Add Complaint");
+        JButton processComplaint = new JButton("Process Complaint");
+        JButton saveData = new JButton("Save Data");
 
-        JButton viewStudents =
-                new JButton("View Students");
+        buttons.add(addStudent);
+        buttons.add(showStudents);
+        buttons.add(showRooms);
+        buttons.add(allocateRoom);
+        buttons.add(addPayment);
+        buttons.add(showPayments);
+        buttons.add(addComplaint);
+        buttons.add(processComplaint);
+        buttons.add(saveData);
 
-        JButton viewRooms =
-                new JButton("View Rooms");
+        mainPanel.add(buttons, BorderLayout.CENTER);
 
-        JButton allocateRoom =
-                new JButton("Allocate Room");
-
-        JButton addPayment =
-                new JButton("Add Payment");
-
-        JButton viewPayments =
-                new JButton("View Payments");
-
-        JButton addComplaint =
-                new JButton("Add Complaint");
-
-        JButton processComplaint =
-                new JButton("Process Complaint");
-
-        JButton saveData =
-                new JButton("Save Data");
-
-
-        buttonPanel.add(addStudent);
-        buttonPanel.add(viewStudents);
-        buttonPanel.add(viewRooms);
-
-        buttonPanel.add(allocateRoom);
-        buttonPanel.add(addPayment);
-        buttonPanel.add(viewPayments);
-
-        buttonPanel.add(addComplaint);
-        buttonPanel.add(processComplaint);
-        buttonPanel.add(saveData);
-
-
-        mainPanel.add(
-                buttonPanel,
-                BorderLayout.CENTER
-        );
-
-
-        // ---------------- OUTPUT AREA ----------------
-
-        outputArea = new JTextArea();
-
-        outputArea.setEditable(false);
-
-        outputArea.setFont(
+        display = new JTextArea();
+        display.setEditable(false);
+        display.setFont(
                 new Font("Monospaced", Font.PLAIN, 14)
         );
 
-        outputArea.setLineWrap(true);
-
-        outputArea.setWrapStyleWord(true);
-
-
-        JScrollPane scrollPane =
-                new JScrollPane(outputArea);
-
-        scrollPane.setPreferredSize(
-                new Dimension(900, 280)
+        JScrollPane scroll = new JScrollPane(display);
+        scroll.setPreferredSize(
+                new Dimension(850, 250)
         );
 
+        mainPanel.add(scroll, BorderLayout.SOUTH);
 
-        mainPanel.add(
-                scrollPane,
-                BorderLayout.SOUTH
-        );
-
-
-        // =====================================================
-        // BUTTON ACTIONS
-        // =====================================================
-
-        addStudent.addActionListener(
-                e -> addStudent()
-        );
-
-        viewStudents.addActionListener(
-                e -> viewStudents()
-        );
-
-        viewRooms.addActionListener(
-                e -> viewRooms()
-        );
-
-        allocateRoom.addActionListener(
-                e -> allocateRoom()
-        );
-
-        addPayment.addActionListener(
-                e -> addPayment()
-        );
-
-        viewPayments.addActionListener(
-                e -> viewPayments()
-        );
-
-        addComplaint.addActionListener(
-                e -> addComplaint()
-        );
-
-        processComplaint.addActionListener(
-                e -> processComplaint()
-        );
-
-        saveData.addActionListener(
-                e -> saveStudents()
-        );
-
+        // Button actions
+        addStudent.addActionListener(e -> addStudent());
+        showStudents.addActionListener(e -> showStudents());
+        showRooms.addActionListener(e -> showRooms());
+        allocateRoom.addActionListener(e -> allocateRoom());
+        addPayment.addActionListener(e -> addPayment());
+        showPayments.addActionListener(e -> showPayments());
+        addComplaint.addActionListener(e -> addComplaint());
+        processComplaint.addActionListener(e -> processComplaint());
+        saveData.addActionListener(e -> saveStudents());
 
         setContentPane(mainPanel);
 
-
-        outputArea.setText(
+        display.setText(
                 "Welcome to SmartHostel!\n\n"
-                        + "This application manages students, rooms,\n"
-                        + "payments and hostel complaints.\n\n"
-                        + "Select an option above to get started."
+                + "Use the buttons above to manage students,\n"
+                + "rooms, payments and complaints."
         );
     }
 
-
-    // =========================================================
-    // ADD STUDENT
-    // =========================================================
-
-    private void addStudent() {
+    // Add a new student
+    void addStudent() {
 
         String name = JOptionPane.showInputDialog(
                 this,
                 "Enter student name:"
         );
 
-        if (!isValidText(name)) {
-
-            showError(
-                    "Please enter a valid student name."
-            );
-
+        if (name == null || name.trim().isEmpty()) {
+            showError("Student name cannot be empty.");
             return;
         }
-
 
         String email = JOptionPane.showInputDialog(
                 this,
                 "Enter student email:"
         );
 
-        if (!isValidEmail(email)) {
+        if (email == null ||
+                !email.contains("@") ||
+                !email.contains(".")) {
 
-            showError(
-                    "Please enter a valid email."
-            );
-
+            showError("Enter a valid email.");
             return;
         }
-
 
         String course = JOptionPane.showInputDialog(
                 this,
                 "Enter course:"
         );
 
-        if (!isValidText(course)) {
-
-            showError(
-                    "Please enter a valid course."
-            );
-
+        if (course == null || course.trim().isEmpty()) {
+            showError("Course cannot be empty.");
             return;
         }
 
-
-        Student student = new Student(
-                nextStudentId++,
+        Student s = new Student(
+                studentId++,
                 name.trim(),
                 email.trim(),
                 course.trim()
         );
 
+        students.add(s);
 
-        students.add(student);
-
-
-        outputArea.setText(
-                "Student added successfully!\n\n"
-                        + student
+        display.setText(
+                "Student added successfully!\n\n" + s
         );
     }
 
-
-    // =========================================================
-    // VIEW STUDENTS
-    // =========================================================
-
-    private void viewStudents() {
+    // Display all students
+    void showStudents() {
 
         if (students.isEmpty()) {
-
-            outputArea.setText(
-                    "No students have been registered yet."
+            display.setText(
+                    "No students have been added yet."
             );
-
             return;
         }
 
+        String result =
+                "============= STUDENTS =============\n\n";
 
-        StringBuilder result =
-                new StringBuilder();
-
-        result.append(
-                "================ STUDENTS ================\n\n"
-        );
-
-
-        for (Student student : students) {
-
-            result.append(student)
-                    .append("\n\n");
+        for (Student s : students) {
+            result += s + "\n\n";
         }
 
-
-        outputArea.setText(
-                result.toString()
-        );
+        display.setText(result);
     }
 
+    // Display room information
+    void showRooms() {
 
-    // =========================================================
-    // VIEW ROOMS
-    // =========================================================
+        String result =
+                "============== ROOMS ==============\n\n";
 
-    private void viewRooms() {
-
-        StringBuilder result =
-                new StringBuilder();
-
-        result.append(
-                "================ ROOMS ================\n\n"
-        );
-
-
-        for (Room room : rooms) {
-
-            result.append(room)
-                    .append("\n");
+        for (Room r : rooms) {
+            result += r + "\n";
         }
 
-
-        outputArea.setText(
-                result.toString()
-        );
+        display.setText(result);
     }
 
-
-    // =========================================================
-    // ROOM ALLOCATION
-    // =========================================================
-
-    private void allocateRoom() {
+    // Allocate a room to a student
+    void allocateRoom() {
 
         if (students.isEmpty()) {
-
-            showError(
-                    "Please add a student first."
-            );
-
+            showError("Please add a student first.");
             return;
         }
 
-
-        String idText = JOptionPane.showInputDialog(
+        String input = JOptionPane.showInputDialog(
                 this,
                 "Enter student ID:"
         );
 
-
         try {
 
-            int studentId =
-                    Integer.parseInt(idText);
+            int id = Integer.parseInt(input);
+            Student s = findStudent(id);
 
-
-            Student student =
-                    findStudent(studentId);
-
-
-            if (student == null) {
-
-                showError(
-                        "Student not found."
-                );
-
+            if (s == null) {
+                showError("Student not found.");
                 return;
             }
 
-
-            if (student.getRoomNumber() != -1) {
-
+            if (s.roomNumber != -1) {
                 showError(
                         "This student already has a room."
                 );
-
                 return;
             }
 
-
-            allocateStudentRoom(student);
-
+            giveRoom(s);
 
         } catch (NumberFormatException e) {
 
-            showError(
-                    "Please enter a valid student ID."
-            );
+            showError("Enter a valid student ID.");
+
+        } catch (RoomNotAvailableException e) {
+
+            showError(e.getMessage());
         }
     }
 
+    // Find an empty bed and assign it
+    void giveRoom(Student student)
+            throws RoomNotAvailableException {
 
-    private void allocateStudentRoom(
-            Student student
-    ) throws RoomNotAvailableException {
+        for (Room r : rooms) {
 
-        for (Room room : rooms) {
+            if (r.hasSpace()) {
 
-            if (room.hasSpace()) {
+                r.allocateBed();
+                student.roomNumber = r.roomNumber;
 
-                room.allocateBed();
-
-                student.setRoomNumber(
-                        room.getRoomNumber()
-                );
-
-
-                outputArea.setText(
+                display.setText(
                         "Room allocated successfully!\n\n"
-                                + "Student: "
-                                + student.getName()
-                                + "\nRoom: "
-                                + room.getRoomNumber()
+                        + "Student: "
+                        + student.name
+                        + "\nRoom Number: "
+                        + r.roomNumber
                 );
 
                 return;
             }
         }
 
-
         throw new RoomNotAvailableException(
-                "No rooms are currently available."
+                "No rooms are available right now."
         );
     }
 
+    // Add payment details
+    void addPayment() {
 
-    // =========================================================
-    // ADD PAYMENT
-    // =========================================================
-
-    private void addPayment() {
-
-        String studentText =
-                JOptionPane.showInputDialog(
-                        this,
-                        "Enter student ID:"
-                );
-
+        String input = JOptionPane.showInputDialog(
+                this,
+                "Enter student ID:"
+        );
 
         try {
 
-            int studentId =
-                    Integer.parseInt(studentText);
+            int id = Integer.parseInt(input);
+            Student s = findStudent(id);
 
-
-            Student student =
-                    findStudent(studentId);
-
-
-            if (student == null) {
-
-                showError(
-                        "Student not found."
-                );
-
+            if (s == null) {
+                showError("Student not found.");
                 return;
             }
 
-
-            String amountText =
+            String amountInput =
                     JOptionPane.showInputDialog(
                             this,
                             "Enter payment amount:"
                     );
 
-
             double amount =
-                    Double.parseDouble(amountText);
-
+                    Double.parseDouble(amountInput);
 
             if (amount <= 0) {
-
                 throw new InvalidPaymentException(
-                        "Payment amount must be greater than zero."
+                        "Payment amount should be greater than zero."
                 );
             }
-
 
             String date =
                     JOptionPane.showInputDialog(
@@ -552,426 +315,268 @@ public class SmartHostel extends JFrame {
                             "Enter payment date:"
                     );
 
-
-            Payment payment = new Payment(
-                    nextPaymentId++,
-                    studentId,
+            Payment p = new Payment(
+                    paymentId++,
+                    id,
                     amount,
                     date
             );
 
+            payments.add(p);
 
-            payments.add(payment);
-
-
-            outputArea.setText(
+            display.setText(
                     "Payment added successfully!\n\n"
-                            + payment
+                    + p
             );
-
 
         } catch (NumberFormatException e) {
 
-            showError(
-                    "Please enter valid numbers."
-            );
-
+            showError("Enter valid numbers.");
 
         } catch (InvalidPaymentException e) {
 
-            showError(
-                    e.getMessage()
-            );
+            showError(e.getMessage());
         }
     }
 
-
-    // =========================================================
-    // VIEW PAYMENTS
-    // =========================================================
-
-    private void viewPayments() {
+    // Show all payments
+    void showPayments() {
 
         if (payments.isEmpty()) {
-
-            outputArea.setText(
-                    "No payments have been recorded yet."
+            display.setText(
+                    "No payments have been recorded."
             );
-
             return;
         }
 
+        String result =
+                "============= PAYMENTS =============\n\n";
 
-        StringBuilder result =
-                new StringBuilder();
-
-
-        result.append(
-                "================ PAYMENTS ================\n\n"
-        );
-
-
-        for (Payment payment : payments) {
-
-            result.append(payment)
-                    .append("\n");
+        for (Payment p : payments) {
+            result += p + "\n";
         }
 
-
-        outputArea.setText(
-                result.toString()
-        );
+        display.setText(result);
     }
 
+    // Register a complaint
+    void addComplaint() {
 
-    // =========================================================
-    // ADD COMPLAINT
-    // =========================================================
-
-    private void addComplaint() {
-
-        String studentText =
-                JOptionPane.showInputDialog(
-                        this,
-                        "Enter student ID:"
-                );
-
+        String input = JOptionPane.showInputDialog(
+                this,
+                "Enter student ID:"
+        );
 
         try {
 
-            int studentId =
-                    Integer.parseInt(studentText);
+            int id = Integer.parseInt(input);
+            Student s = findStudent(id);
 
-
-            Student student =
-                    findStudent(studentId);
-
-
-            if (student == null) {
-
-                showError(
-                        "Student not found."
-                );
-
+            if (s == null) {
+                showError("Student not found.");
                 return;
             }
 
-
-            String description =
+            String text =
                     JOptionPane.showInputDialog(
                             this,
-                            "Enter complaint:"
+                            "Enter your complaint:"
                     );
 
-
-            if (!isValidText(description)) {
-
+            if (text == null || text.trim().isEmpty()) {
                 showError(
                         "Complaint cannot be empty."
                 );
-
                 return;
             }
 
-
-            Complaint complaint =
-                    new Complaint(
-                            nextComplaintId++,
-                            studentId,
-                            description
-                    );
-
-
-            complaints.add(complaint);
-
-
-            outputArea.setText(
-                    "Complaint registered!\n\n"
-                            + complaint
+            Complaint c = new Complaint(
+                    complaintId++,
+                    id,
+                    text.trim()
             );
 
+            complaints.add(c);
+
+            display.setText(
+                    "Complaint registered successfully!\n\n"
+                    + c
+            );
 
         } catch (NumberFormatException e) {
 
-            showError(
-                    "Please enter a valid student ID."
-            );
+            showError("Enter a valid student ID.");
         }
     }
 
-
-    // =========================================================
-    // PROCESS COMPLAINT
-    // =========================================================
-
-    private void processComplaint() {
+    // Process a complaint using a separate thread
+    void processComplaint() {
 
         if (complaints.isEmpty()) {
-
-            showError(
-                    "There are no complaints."
-            );
-
+            showError("There are no complaints.");
             return;
         }
 
-
-        String idText =
-                JOptionPane.showInputDialog(
-                        this,
-                        "Enter complaint ID:"
-                );
-
+        String input = JOptionPane.showInputDialog(
+                this,
+                "Enter complaint ID:"
+        );
 
         try {
 
-            int complaintId =
-                    Integer.parseInt(idText);
+            int id = Integer.parseInt(input);
+            Complaint c = findComplaint(id);
 
-
-            Complaint complaint =
-                    findComplaint(complaintId);
-
-
-            if (complaint == null) {
-
-                showError(
-                        "Complaint not found."
-                );
-
+            if (c == null) {
+                showError("Complaint not found.");
                 return;
             }
 
-
-            if (complaint.getStatus()
-                    .equals("Resolved")) {
-
+            if (c.status.equals("Resolved")) {
                 showError(
-                        "Complaint is already resolved."
+                        "This complaint is already resolved."
                 );
-
                 return;
             }
-
 
             ComplaintThread thread =
-                    new ComplaintThread(
-                            complaint
-                    );
-
+                    new ComplaintThread(c);
 
             thread.start();
 
-
-            outputArea.setText(
+            display.setText(
                     "Complaint processing started.\n\n"
-                            + "Complaint ID: "
-                            + complaint.getComplaintId()
-                            + "\nStatus: Processing..."
+                    + "Complaint ID: " + id
+                    + "\nStatus: Processing..."
             );
-
 
         } catch (NumberFormatException e) {
 
-            showError(
-                    "Please enter a valid complaint ID."
-            );
+            showError("Enter a valid complaint ID.");
         }
     }
 
+    // Save student data into a text file
+    void saveStudents() {
 
-    // =========================================================
-    // SAVE STUDENTS
-    // =========================================================
+        try {
 
-    private void saveStudents() {
+            BufferedWriter writer =
+                    new BufferedWriter(
+                            new FileWriter("students.txt")
+                    );
 
-        try (
-                BufferedWriter writer =
-                        new BufferedWriter(
-                                new FileWriter(
-                                        "students.txt"
-                                )
-                        )
-        ) {
-
-            for (Student student : students) {
+            for (Student s : students) {
 
                 writer.write(
-                        student.getId()
-                                + "|"
-                                + student.getName()
-                                + "|"
-                                + student.getEmail()
-                                + "|"
-                                + student.getCourse()
-                                + "|"
-                                + student.getRoomNumber()
+                        s.id + "|"
+                        + s.name + "|"
+                        + s.email + "|"
+                        + s.course + "|"
+                        + s.roomNumber
                 );
 
                 writer.newLine();
             }
 
+            writer.close();
 
-            outputArea.setText(
+            display.setText(
                     "Student data saved successfully!\n\n"
-                            + "File: students.txt"
+                    + "File created: students.txt"
             );
-
 
         } catch (IOException e) {
 
             showError(
-                    "Could not save data: "
-                            + e.getMessage()
+                    "Error while saving data."
             );
         }
     }
 
+    // Load previously saved students
+    void loadStudents() {
 
-    // =========================================================
-    // LOAD STUDENTS
-    // =========================================================
-
-    private void loadStudents() {
-
-        File file =
-                new File("students.txt");
-
+        File file = new File("students.txt");
 
         if (!file.exists()) {
             return;
         }
 
+        try {
 
-        try (
-                BufferedReader reader =
-                        new BufferedReader(
-                                new FileReader(file)
-                        )
-        ) {
+            BufferedReader reader =
+                    new BufferedReader(
+                            new FileReader(file)
+                    );
 
             String line;
 
-
-            while (
-                    (line = reader.readLine())
-                            != null
-            ) {
+            while ((line = reader.readLine()) != null) {
 
                 String[] data =
                         line.split("\\|");
-
 
                 if (data.length >= 5) {
 
                     int id =
                             Integer.parseInt(data[0]);
 
+                    Student s = new Student(
+                            id,
+                            data[1],
+                            data[2],
+                            data[3]
+                    );
 
-                    Student student =
-                            new Student(
-                                    id,
-                                    data[1],
-                                    data[2],
-                                    data[3]
-                            );
-
-
-                    int room =
+                    s.roomNumber =
                             Integer.parseInt(data[4]);
 
+                    students.add(s);
 
-                    student.setRoomNumber(room);
-
-
-                    students.add(student);
-
-
-                    if (id >= nextStudentId) {
-
-                        nextStudentId =
-                                id + 1;
+                    if (id >= studentId) {
+                        studentId = id + 1;
                     }
                 }
             }
 
+            reader.close();
 
-        } catch (
-                IOException |
-                NumberFormatException e
-        ) {
+        } catch (Exception e) {
 
             System.out.println(
-                    "Could not load students: "
-                            + e.getMessage()
+                    "Could not load old student data."
             );
         }
     }
 
+    // Search student using ID
+    Student findStudent(int id) {
 
-    // =========================================================
-    // SEARCH STUDENT
-    // =========================================================
+        for (Student s : students) {
 
-    private Student findStudent(int id) {
-
-        for (Student student : students) {
-
-            if (student.getId() == id) {
-
-                return student;
+            if (s.id == id) {
+                return s;
             }
         }
-
 
         return null;
     }
 
+    // Search complaint using ID
+    Complaint findComplaint(int id) {
 
-    // =========================================================
-    // SEARCH COMPLAINT
-    // =========================================================
+        for (Complaint c : complaints) {
 
-    private Complaint findComplaint(int id) {
-
-        for (Complaint complaint : complaints) {
-
-            if (complaint.getComplaintId() == id) {
-
-                return complaint;
+            if (c.complaintId == id) {
+                return c;
             }
         }
-
 
         return null;
     }
 
-
-    // =========================================================
-    // VALIDATION
-    // =========================================================
-
-    private boolean isValidText(String text) {
-
-        return text != null
-                && !text.trim().isEmpty();
-    }
-
-
-    private boolean isValidEmail(String email) {
-
-        return email != null
-                && email.contains("@")
-                && email.contains(".");
-    }
-
-
-    // =========================================================
-    // ERROR MESSAGE
-    // =========================================================
-
-    private void showError(String message) {
+    void showError(String message) {
 
         JOptionPane.showMessageDialog(
                 this,
@@ -981,18 +586,34 @@ public class SmartHostel extends JFrame {
         );
     }
 
+    // Parent class
+    static abstract class User {
 
-    // =========================================================
-    // STUDENT CLASS
-    // =========================================================
+        int id;
+        String name;
+        String email;
 
+        User(
+                int id,
+                String name,
+                String email
+        ) {
+
+            this.id = id;
+            this.name = name;
+            this.email = email;
+        }
+
+        abstract String getUserType();
+    }
+
+    // Student class inherits User
     static class Student extends User {
 
-        private String course;
-        private int roomNumber;
+        String course;
+        int roomNumber = -1;
 
-
-        public Student(
+        Student(
                 int id,
                 String name,
                 String email,
@@ -1000,39 +621,14 @@ public class SmartHostel extends JFrame {
         ) {
 
             super(id, name, email);
-
             this.course = course;
-
-            this.roomNumber = -1;
         }
-
-
-        public String getCourse() {
-
-            return course;
-        }
-
-
-        public int getRoomNumber() {
-
-            return roomNumber;
-        }
-
-
-        public void setRoomNumber(
-                int roomNumber
-        ) {
-
-            this.roomNumber = roomNumber;
-        }
-
 
         @Override
-        public String getUserType() {
+        String getUserType() {
 
             return "Student";
         }
-
 
         @Override
         public String toString() {
@@ -1040,151 +636,62 @@ public class SmartHostel extends JFrame {
             String room =
                     roomNumber == -1
                             ? "Not Allocated"
-                            : String.valueOf(
-                                    roomNumber
-                            );
+                            : String.valueOf(roomNumber);
 
-
-            return "Student ID: "
-                    + getId()
-                    + "\nName: "
-                    + getName()
-                    + "\nEmail: "
-                    + getEmail()
-                    + "\nCourse: "
-                    + course
-                    + "\nRoom: "
-                    + room;
+            return "Student ID: " + id
+                    + "\nName: " + name
+                    + "\nEmail: " + email
+                    + "\nCourse: " + course
+                    + "\nRoom: " + room;
         }
     }
 
-
-    // =========================================================
-    // USER ABSTRACT CLASS
-    // =========================================================
-
-    static abstract class User {
-
-        private int id;
-        private String name;
-        private String email;
-
-
-        public User(
-                int id,
-                String name,
-                String email
-        ) {
-
-            this.id = id;
-
-            this.name = name;
-
-            this.email = email;
-        }
-
-
-        public int getId() {
-
-            return id;
-        }
-
-
-        public String getName() {
-
-            return name;
-        }
-
-
-        public String getEmail() {
-
-            return email;
-        }
-
-
-        public abstract String getUserType();
-    }
-
-
-    // =========================================================
-    // ROOM CLASS
-    // =========================================================
-
+    // Room class
     static class Room {
 
-        private int roomNumber;
-        private int capacity;
-        private int occupiedBeds;
+        int roomNumber;
+        int capacity;
+        int occupied;
 
-
-        public Room(
-                int roomNumber,
-                int capacity
-        ) {
+        Room(int roomNumber, int capacity) {
 
             this.roomNumber = roomNumber;
-
             this.capacity = capacity;
-
-            this.occupiedBeds = 0;
+            occupied = 0;
         }
 
+        boolean hasSpace() {
 
-        public int getRoomNumber() {
-
-            return roomNumber;
+            return occupied < capacity;
         }
 
-
-        public boolean hasSpace() {
-
-            return occupiedBeds < capacity;
-        }
-
-
-        public void allocateBed() {
+        void allocateBed() {
 
             if (hasSpace()) {
-
-                occupiedBeds++;
+                occupied++;
             }
         }
-
-
-        public int getAvailableBeds() {
-
-            return capacity - occupiedBeds;
-        }
-
 
         @Override
         public String toString() {
 
-            return "Room "
-                    + roomNumber
-                    + " | Capacity: "
-                    + capacity
-                    + " | Occupied: "
-                    + occupiedBeds
+            return "Room " + roomNumber
+                    + " | Capacity: " + capacity
+                    + " | Occupied: " + occupied
                     + " | Available: "
-                    + getAvailableBeds();
+                    + (capacity - occupied);
         }
     }
 
-
-    // =========================================================
-    // PAYMENT CLASS
-    // =========================================================
-
+    // Payment class
     static class Payment {
 
-        private int paymentId;
-        private int studentId;
-        private double amount;
-        private String date;
+        int paymentId;
+        int studentId;
+        double amount;
+        String date;
 
-
-        public Payment(
+        Payment(
                 int paymentId,
                 int studentId,
                 double amount,
@@ -1192,80 +699,40 @@ public class SmartHostel extends JFrame {
         ) {
 
             this.paymentId = paymentId;
-
             this.studentId = studentId;
-
             this.amount = amount;
-
             this.date = date;
         }
-
 
         @Override
         public String toString() {
 
-            return "Payment ID: "
-                    + paymentId
-                    + " | Student ID: "
-                    + studentId
-                    + " | Amount: ₹"
-                    + String.format(
-                            "%.2f",
-                            amount
-                    )
-                    + " | Date: "
-                    + date;
+            return "Payment ID: " + paymentId
+                    + " | Student ID: " + studentId
+                    + " | Amount: Rs. "
+                    + String.format("%.2f", amount)
+                    + " | Date: " + date;
         }
     }
 
-
-    // =========================================================
-    // COMPLAINT CLASS
-    // =========================================================
-
+    // Complaint class
     static class Complaint {
 
-        private int complaintId;
-        private int studentId;
-        private String description;
-        private String status;
+        int complaintId;
+        int studentId;
+        String description;
+        String status = "Pending";
 
-
-        public Complaint(
+        Complaint(
                 int complaintId,
                 int studentId,
                 String description
         ) {
 
             this.complaintId = complaintId;
-
             this.studentId = studentId;
-
             this.description = description;
-
-            this.status = "Pending";
         }
-
-
-        public int getComplaintId() {
-
-            return complaintId;
-        }
-
-
-        public String getStatus() {
-
-            return status;
-        }
-
-
-        public void setStatus(
-                String status
-        ) {
-
-            this.status = status;
-        }
-
 
         @Override
         public String toString() {
@@ -1274,121 +741,78 @@ public class SmartHostel extends JFrame {
                     + complaintId
                     + " | Student ID: "
                     + studentId
-                    + " | Complaint: "
+                    + "\nComplaint: "
                     + description
-                    + " | Status: "
+                    + "\nStatus: "
                     + status;
         }
     }
 
-
-    // =========================================================
-    // CUSTOM EXCEPTION
-    // =========================================================
-
+    // Custom exception for room allocation
     static class RoomNotAvailableException
             extends Exception {
 
-        public RoomNotAvailableException(
-                String message
-        ) {
+        RoomNotAvailableException(String message) {
 
             super(message);
         }
     }
 
-
-    // =========================================================
-    // CUSTOM PAYMENT EXCEPTION
-    // =========================================================
-
+    // Custom exception for payment
     static class InvalidPaymentException
             extends Exception {
 
-        public InvalidPaymentException(
-                String message
-        ) {
+        InvalidPaymentException(String message) {
 
             super(message);
         }
     }
 
+    // Thread used to process complaints
+    static class ComplaintThread extends Thread {
 
-    // =========================================================
-    // MULTITHREADING
-    // =========================================================
+        Complaint complaint;
 
-    static class ComplaintThread
-            extends Thread {
-
-        private Complaint complaint;
-
-
-        public ComplaintThread(
-                Complaint complaint
-        ) {
+        ComplaintThread(Complaint complaint) {
 
             this.complaint = complaint;
         }
-
 
         @Override
         public void run() {
 
             try {
 
-                complaint.setStatus(
-                        "Processing"
-                );
+                complaint.status = "Processing";
 
-
+                // Simulating complaint processing
                 Thread.sleep(2000);
 
-
-                complaint.setStatus(
-                        "Resolved"
-                );
-
+                complaint.status = "Resolved";
 
                 System.out.println(
                         "Complaint "
-                                + complaint.getComplaintId()
-                                + " resolved."
+                        + complaint.complaintId
+                        + " resolved."
                 );
 
+            } catch (InterruptedException e) {
 
-            } catch (
-                    InterruptedException e
-            ) {
-
-                complaint.setStatus(
-                        "Interrupted"
-                );
-
-
-                Thread.currentThread()
-                        .interrupt();
+                complaint.status = "Interrupted";
+                Thread.currentThread().interrupt();
             }
         }
     }
 
+    // Main method
+    public static void main(String[] args) {
 
-    // =========================================================
-    // MAIN METHOD
-    // =========================================================
+        SwingUtilities.invokeLater(() -> {
 
-    public static void main(
-            String[] args
-    ) {
+            SmartHostel app =
+                    new SmartHostel();
 
-        SwingUtilities.invokeLater(
-                () -> {
-
-                    SmartHostel app =
-                            new SmartHostel();
-
-                    app.setVisible(true);
-                }
-        );
+            app.setVisible(true);
+        });
     }
 }
