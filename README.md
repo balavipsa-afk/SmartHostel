@@ -104,3 +104,6 @@ SmartHostel-Java-Management-System/
 ├── SmartHostel.java    # Complete Java application
 ├── README.md           # Project documentation
 └── statement.md        # Problem statement
+## screenshot
+
+<img width="1420" height="630" alt="image" src="https://github.com/user-attachments/assets/3472b615-154a-4524-b4b6-52b868901049" />
